@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "camt-to-erpnext"
+version = "0.2.0"
+description = ""
+authors = ["barredterra <14891507+barredterra@users.noreply.github.com>"]
+readme = "README.md"
+packages = [{include = "camt_to_erpnext"}]
+
+[tool.poetry.scripts]
+camt-to-erpnext = "camt_to_erpnext.main:app"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+typer = {extras = ["all"], version = "^0.6.1"}
+
+[tool.poetry.group.dev.dependencies]
+black = "^22.8.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
