@@ -1,10 +1,17 @@
 [tool.poetry]
 name = "camt-to-erpnext"
 version = "0.2.1"
-description = ""
+description = "Convert a CAMT CSV file into a normal CSV file that can be used for importing Bank Transactions into ERPNext."
+repository = "https://github.com/barredterra/camt-to-erpnext"
 authors = ["barredterra <14891507+barredterra@users.noreply.github.com>"]
 readme = "README.md"
 packages = [{include = "camt_to_erpnext"}]
+classifiers = [
+    "Topic :: Office/Business :: Financial :: Accounting",
+    "Intended Audience :: End Users/Desktop",
+    "License :: OSI Approved :: MIT License",
+    "Natural Language :: German"
+]
 
 [tool.poetry.scripts]
 camt-to-erpnext = "camt_to_erpnext.main:app"
