@@ -12,6 +12,7 @@ camt-to-erpnext convert IN_PATH OUT_PATH
 - Quoting: all columns quoted
 - Date Format: `28.02.99`
 - Number Format: `-1234,56`
+- Encoding: `cp1252`
 - Columns:
     - Auftragskonto
     - Buchungstag
@@ -37,6 +38,7 @@ camt-to-erpnext convert IN_PATH OUT_PATH
 - Quoting: where necessary
 - Date Format: `1999-02-28`
 - Number Format: `1234.56`
+- Encoding: `utf-8`
 - Columns:
     - Date
 
