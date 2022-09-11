@@ -2,6 +2,12 @@
 
 This project uses `isort` and `black` to format python code.
 
+## Testing
+
+This project uses `pytest` to test python functions.
+
+Just run `pytest` in the root folder to  execute the `test_*` files in the `tests/` directory.
+
 ## Release
 
 Bump version:
