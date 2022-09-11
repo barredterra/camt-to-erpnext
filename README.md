@@ -1,3 +1,5 @@
+[![PyPI version](https://badge.fury.io/py/camt-to-erpnext.svg)](https://badge.fury.io/py/camt-to-erpnext)
+
 This CLI can convert a CAMT CSV file (provided by your bank) into a normal CSV file that can be used for importing **Bank Transactions** into ERPNext.
 
 Usage:
