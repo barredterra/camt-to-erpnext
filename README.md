@@ -2,10 +2,18 @@
 
 This CLI can convert a CAMT CSV file (provided by your bank) into a normal CSV file that can be used for importing **Bank Transactions** into ERPNext.
 
-Usage:
+### Installation
+
+It is easiest to install `camt-to-erpnext` with [`pipx`](https://github.com/pypa/pipx), a tool to "install and run python applications in isolated environments":
 
 ```
-camt-to-erpnext convert IN_PATH OUT_PATH
+pipx install camt-to-erpnext
+```
+
+### Usage
+
+```
+camt-to-erpnext convert INPUT_PATH OUTPUT_PATH
 ```
 
 ### Input format
