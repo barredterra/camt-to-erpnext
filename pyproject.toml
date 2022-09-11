@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "camt-to-erpnext"
-version = "0.2.0"
+version = "0.2.1"
 description = ""
 authors = ["barredterra <14891507+barredterra@users.noreply.github.com>"]
 readme = "README.md"
