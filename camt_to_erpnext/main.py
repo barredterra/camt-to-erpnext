@@ -7,6 +7,35 @@ from hashlib import blake2b
 
 app = typer.Typer()
 
+HASH_COLUMNS = [
+    "Buchungstag",
+    "Betrag",
+    "Verwendungszweck",
+    "Kontonummer/IBAN",
+    "BIC (SWIFT-Code)",
+]
+
+DESCRIPTION_COLUMNS = [
+    "Beguenstigter/Zahlungspflichtiger",
+    "Verwendungszweck",
+    "Kontonummer/IBAN",
+    "BIC (SWIFT-Code)",
+    "Glaeubiger ID",
+    "Mandatsreferenz",
+    "Kundenreferenz (End-to-End)",
+    "Valutadatum",
+]
+
+OUTPUT_COLUMNS = [
+    "Date",
+    "Deposit",
+    "Withdrawal",
+    "Description",
+    "Reference Number",
+    "Bank Account",
+    "Currency",
+]
+
 
 @app.callback()
 def callback():
@@ -16,73 +45,46 @@ def callback():
 
 
 @app.command()
-def convert(in_path: Path, out_path: Path):
-    """Convert CAMT-CSV to ERPNext-CSV"""
-    DESCRIPTION_COLUMNS = [
-        "Beguenstigter/Zahlungspflichtiger",
-        "Verwendungszweck",
-        "Kontonummer/IBAN",
-        "BIC (SWIFT-Code)",
-        "Glaeubiger ID",
-        "Mandatsreferenz",
-        "Kundenreferenz (End-to-End)",
-        "Valutadatum",
-    ]
+def convert(input_path: Path, output_path: Path):
+    """Convert CAMT-CSV to ERPNext-CSV.
 
-    # csv.register_dialect("camt", delimiter=";", quoting=csv.QUOTE_ALL)
-    with open(in_path, "r", encoding="cp1252") as in_file:
+    Read a CAMT-CSV from `in_path`, convert date, amount and description,
+    calculate a transaction id, and write an ERPNext-CSV to `out_path`.
+    """
+    with open(input_path, "r", encoding="cp1252") as in_file, open(
+        output_path, "w", encoding="utf-8"
+    ) as out_file:
         reader = csv.DictReader(in_file, delimiter=";", quoting=csv.QUOTE_ALL)
-        output = []
-        for row in reader:
-            signed_amount = float(row["Betrag"].replace(",", "."))
-
-            output.append(
-                {
-                    "Date": datetime.strptime(row["Buchungstag"], "%d.%m.%y")
-                    .date()
-                    .isoformat(),
-                    "Deposit": signed_amount if signed_amount > 0 else None,
-                    "Withdrawal": abs(signed_amount) if signed_amount < 0 else None,
-                    "Description": "\n".join(
-                        [
-                            f"{column}: {row[column]}"
-                            for column in DESCRIPTION_COLUMNS
-                            if row[column]
-                        ]
-                    ),
-                    "Reference Number": transaction_id(row),
-                    "Bank Account": row["Auftragskonto"],
-                    "Currency": row["Waehrung"],
-                }
-            )
-
-    with open(out_path, "w", encoding="utf-8") as out_file:
-        OUTPUT_COLUMNS = [
-            "Date",
-            "Deposit",
-            "Withdrawal",
-            "Description",
-            "Reference Number",
-            "Bank Account",
-            "Currency",
-        ]
         writer = csv.DictWriter(out_file, fieldnames=OUTPUT_COLUMNS)
         writer.writeheader()
-        writer.writerows(output)
+        for row in reader:
+            writer.writerow(convert_row(row))
 
 
-def transaction_id(row):
-    HASH_COLUMNS = [
-        "Buchungstag",
-        "Betrag",
-        "Verwendungszweck",
-        "Kontonummer/IBAN",
-        "BIC (SWIFT-Code)",
-    ]
+def convert_row(row: dict) -> dict:
+    signed_amount = float(row["Betrag"].replace(",", "."))
+    return {
+        "Date": isoformat_date(row["Buchungstag"], "%d.%m.%y"),
+        "Deposit": signed_amount if signed_amount > 0 else None,
+        "Withdrawal": abs(signed_amount) if signed_amount < 0 else None,
+        "Description": dict_to_str(row, DESCRIPTION_COLUMNS),
+        "Reference Number": dict_to_hash(row, HASH_COLUMNS),
+        "Bank Account": row["Auftragskonto"],
+        "Currency": row["Waehrung"],
+    }
 
-    transaction_hash = blake2b(digest_size=16)
 
-    for column in HASH_COLUMNS:
-        transaction_hash.update(row[column].encode("utf-8"))
+def dict_to_hash(data: dict, keys: list[str]) -> str:
+    blake_hash = blake2b(digest_size=16)
+    for key in keys:
+        blake_hash.update(data[key].encode("utf-8"))
 
-    return transaction_hash.hexdigest()
+    return blake_hash.hexdigest()
+
+
+def dict_to_str(data: dict, keys: list[str]) -> str:
+    return "\n".join([f"{key}: {data[key]}" for key in keys if data[key]])
+
+
+def isoformat_date(date: str, source_format: str) -> str:
+    return datetime.strptime(date, source_format).date().isoformat()
