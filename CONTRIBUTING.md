@@ -10,6 +10,13 @@ Bump version:
 poetry version [patch | minor | major | prepatch | preminor | premajor | prerelease]
 ```
 
+Commit bumped version:
+
+```
+git add pyproject.toml
+git commit -m "chore: bump version"
+```
+
 Build package:
 
 ```
